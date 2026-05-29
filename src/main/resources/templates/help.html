@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Помочь приюту</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/catalog">Каталог животных</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/help">Помочь приюту</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">О нас</a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a href="/login" class="btn btn-outline-light me-2">Вход</a>
+                    <a href="/register" class="btn btn-primary">Регистрация</a>
+                </div>
+
+                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
+                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
+                        Привет, <span th:text="${userName}">Имя</span>!
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Как вы можете помочь?</h1>
+
+    <div class="row g-5">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <h3 class="text-primary mb-4">💳 Денежное пожертвование</h3>
+                <p>Все средства идут на покупку корма, лекарств и оплату услуг ветеринаров.</p>
+
+                <form th:action="@{/help/donate}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Сумма пожертвования (₽)</label>
+                        <input type="number" name="amount" class="form-control" required min="10">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Комментарий (необязательно)</label>
+                        <input type="text" name="comment" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Пожертвовать</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <h3 class="text-success mb-4">🐾 Стать волонтёром</h3>
+
+                <div th:if="${param.success}" class="alert alert-success">Ваша заявка принята! Мы скоро свяжемся с вами.</div>
+
+                <div th:if="${#authorization.expression('isAuthenticated()')}">
+                    <form th:action="@{/help/volunteer}" th:object="${volunteerRequest}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Чем вы хотите помочь?</label>
+                            <select th:field="*{activityType}" class="form-select">
+                                <option value="Выгул собак">Выгул собак</option>
+                                <option value="Уборка вольеров">Уборка вольеров</option>
+                                <option value="Фото и соцсети">Фото и соцсети</option>
+                                <option value="Транспортировка">Транспортировка</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ваш опыт (пару слов)</label>
+                            <textarea th:field="*{experience}" class="form-control" rows="3" placeholder="Был ли у вас опыт общения с животными?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">Отправить анкету</button>
+                    </form>
+                </div>
+
+                <div th:unless="${#authorization.expression('isAuthenticated()')}" class="text-center py-4">
+                    <p>Чтобы подать заявку на волонтёрство, пожалуйста, войдите в систему.</p>
+                    <a href="/login" class="btn btn-outline-success">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5 py-4 bg-light rounded-4 shadow-sm">
+        <div class="row mb-4 text-center">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold text-dark">Нам всегда нужна ваша поддержка</h2>
+                <p class="text-muted fs-5">
+                    Мы составили список самых необходимых вещей для наших подопечных.
+                    Ниже вы можете в реальном времени увидеть, чего сейчас приюту не хватает больше всего.
+                </p>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge bg-danger rounded-pill px-3">Срочно</span>
+                    <span class="badge bg-warning text-dark rounded-pill px-3">Заканчивается</span>
+                    <span class="badge bg-success rounded-pill px-3">В достатке</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row px-3">
+            <div class="col-md-6 col-lg-4 mb-4" th:each="s : ${supplies}">
+                <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-primary" th:text="${s.name}">Товар</h5>
+                                <small class="text-muted" th:text="${s.unit}">кг</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="h5 fw-bold mb-0" th:text="${#numbers.formatDecimal(s.currentAmount, 0, 1)}">10</span>
+                                <span class="text-muted">/</span>
+                                <span class="text-muted" th:text="${#numbers.formatDecimal(s.targetAmount, 0, 0)}">50</span>
+                            </div>
+                        </div>
+
+                        <div class="progress mb-3" style="height: 12px; background-color: #e9ecef; border-radius: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated shadow-none"
+                                 role="progressbar"
+                                 th:style="'width: ' + ${s.getPercent()} + '%'"
+                                 th:classappend="${s.getColorClass()}"
+                                 style="border-radius: 20px;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <i th:if="${s.getPercent() < 30}" class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                            <i th:if="${s.getPercent() >= 30 && s.getPercent() < 70}" class="bi bi-info-circle-fill text-warning me-2"></i>
+                            <i th:if="${s.getPercent() >= 70}" class="bi bi-check-circle-fill text-success me-2"></i>
+
+                            <span class="small fw-semibold"
+                                  th:classappend="${s.getPercent() < 30 ? 'text-danger' : (s.getPercent() < 70 ? 'text-warning' : 'text-success')}"
+                                  th:text="${s.getPercent() < 30 ? 'Срочно нужно!' : (s.getPercent() < 70 ? 'Заканчивается' : 'Всего хватает')}">
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

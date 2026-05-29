@@ -1,0 +1,33 @@
+# Target directory (Maven build outputs)
+target/
+*.war
+*.jar
+*.ear
+
+# IntelliJ IDEA configuration logs and files
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse configuration files
+.settings/
+.project
+.classpath
+.factorypath
+
+# Operating System temporary files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Log files
+*.log
+logs/
+Tomcat_logs/
+
+# Application configuration secrets (if any local overrides exist)
+*.local

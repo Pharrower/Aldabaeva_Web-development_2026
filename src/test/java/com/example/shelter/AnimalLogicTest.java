@@ -12,10 +12,15 @@ public class AnimalLogicTest {
         animal.setName("Барсик");
         animal.setSpecies("Кот");
         animal.setAge(3);
+        animal.setStatus("AVAILABLE");
+        animal.setDescription("Милый котик");
+        animal.setHealthStatus("Healthy");
 
-        // Проверяем, что данные сохраняются и возвращаются корректно
         assertEquals("Барсик", animal.getName());
         assertEquals("Кот", animal.getSpecies());
         assertEquals(3, animal.getAge());
+        assertEquals("AVAILABLE", animal.getStatus());
+        assertEquals("Милый котик", animal.getDescription());
+        assertEquals("Healthy", animal.getHealthStatus());
     }
 }

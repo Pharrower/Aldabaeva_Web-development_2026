@@ -2,98 +2,180 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Мой профиль</title>
+    <title>Мой профиль — Приют "Доброе сердце"</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div th:replace="~{fragments :: navbar}"></div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/catalog">Каталог животных</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/help">Помочь приюту</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">О нас</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
-                </li>
-            </ul>
+<div class="container mt-5 mb-5">
 
-            <div class="d-flex align-items-center">
-                <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                    <a href="/login" class="btn btn-outline-light me-2">Вход</a>
-                    <a href="/register" class="btn btn-primary">Регистрация</a>
-                </div>
+    <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> Личные данные успешно обновлены!
+        <button type="button" class="btn-close" data-bs-dismiss="show" aria-label="Close"></button>
+    </div>
+    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> Ошибка при обновлении данных. Проверьте правильность ввода.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
-                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                        Привет, <span th:text="${userName}">Имя</span>!
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 text-center animal-card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="profile-avatar shadow-sm">
+                            <i class="bi bi-person-bounding-box"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1" th:text="${userName}">Имя пользователя</h4>
+                        <p class="text-muted small mb-3">Надежный друг нашего приюта</p>
+
+                        <div class="row g-2 mt-3 p-3 bg-light rounded-3 text-start border border-light">
+                            <div class="col-6 border-end text-center">
+                                <span class="d-block text-muted small fw-semibold text-uppercase">Заявки</span>
+                                <span class="h4 fw-bold text-dark" th:text="${myRequests != null ? myRequests.size() : 0}">0</span>
+                            </div>
+                            <div class="col-6 text-center">
+                                <span class="d-block text-muted small fw-semibold text-uppercase">Добрые дела</span>
+                                <span class="h4 fw-bold text-success" th:text="${myDonations != null ? myDonations.size() : 0}">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-secondary w-100 fw-semibold mt-4" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="bi bi-gear-fill me-2"></i> Редактировать профиль
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
-                            </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 h-100">
+                <div class="card-body">
+
+                    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active py-2.5 px-4" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests-pane" type="button" role="tab">
+                                <i class="bi bi-file-earmark-text me-2"></i>Мои заявки
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link py-2.5 px-4" id="donations-tab" data-bs-toggle="tab" data-bs-target="#donations-pane" type="button" role="tab">
+                                <i class="bi bi-heart-fill me-2 text-danger"></i>Пожертвования
+                            </button>
                         </li>
                     </ul>
+
+                    <div class="tab-content" id="profileTabsContent">
+
+                        <div class="tab-pane fade show active" id="requests-pane" role="tabpanel" tabindex="0">
+                            <div th:if="${#lists.isEmpty(myRequests)}" class="text-center py-5">
+                                <i class="bi bi-chat-heart text-muted display-4 d-block mb-3"></i>
+                                <p class="text-secondary">Вы пока не подавали заявок на пристройство.</p>
+                                <a href="/catalog" class="btn btn-primary btn-sm fw-semibold mt-2">Выбрать питомца</a>
+                            </div>
+
+                            <div th:unless="${#lists.isEmpty(myRequests)}" class="d-flex flex-column gap-3">
+                                <div th:each="req : ${myRequests}" class="p-3 rounded-3 shadow-sm history-item"
+                                     th:classappend="${req.status == 'PENDING' ? 'status-pending' : (req.status == 'APPROVED' ? 'status-approved' : 'status-rejected')}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="fw-bold text-dark mb-1">
+                                                <i class="bi bi-paw-fill text-warning me-1"></i>
+                                                Заявка на хвостика: <span th:text="${req.animal.name}">Имя</span>
+                                            </h5>
+                                            <p class="small text-muted mb-2">
+                                                <i class="bi bi-clock me-1"></i> <span th:text="${#temporals.format(req.requestDate, 'dd.MM.yyyy HH:mm')}">Дата</span>
+                                            </p>
+                                            <p class="mb-0 text-secondary small italic" th:text="'«' + ${req.message} + '»'">Сообщение...</p>
+                                        </div>
+                                        <div>
+                                            <span class="badge text-uppercase px-2.5 py-1.5"
+                                                  th:classappend="${req.status == 'PENDING' ? 'bg-warning text-dark' : (req.status == 'APPROVED' ? 'bg-success' : 'bg-danger')}"
+                                                  th:text="${req.status == 'PENDING' ? 'На рассмотрении' : (req.status == 'APPROVED' ? 'Одобрено' : 'Отклонено')}">
+                                                Статус
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="donations-pane" role="tabpanel" tabindex="0">
+                            <div th:if="${#lists.isEmpty(myDonations)}" class="text-center py-5">
+                                <i class="bi bi-wallet2 text-muted display-4 d-block mb-3"></i>
+                                <p class="text-secondary">История ваших пожертвований пока пуста.</p>
+                                <a href="/help" class="btn btn-primary btn-sm fw-semibold mt-2">Поддержать приют</a>
+                            </div>
+
+                            <div th:unless="${#lists.isEmpty(myDonations)}" class="d-flex flex-column gap-3">
+                                <div class="p-3 bg-success bg-opacity-10 rounded-3 mb-2 border border-success-subtle text-success">
+                                    <i class="bi bi-trophy-fill me-2"></i>Огромное вам спасибо! Каждое ваше пожертвование спасает жизни.
+                                </div>
+
+                                <div th:each="donate : ${myDonations}" class="p-3 rounded-3 shadow-sm history-item donation-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="fw-bold text-dark mb-1">
+                                                <i class="bi bi-check-circle-fill text-success me-1"></i> Благотворительный взнос
+                                            </h5>
+                                            <p class="small text-muted mb-0" th:if="${donate.comment != null && !donate.comment.isEmpty()}" th:text="'Комментарий: ' + ${donate.comment}">Комментарий</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="h5 fw-bold text-success" th:text="${#numbers.formatDecimal(donate.amount, 1, 0)} + ' ₽'">1000 ₽</span>
+                                            <div class="small text-muted" th:text="${#temporals.format(donate.donatedAt != null ? donate.donatedAt : #temporals.createNow(), 'dd.MM.yyyy')}">01.01.2026</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</nav>
+</div>
 
-<div class="container mt-5">
-    <h2>Мои заявки на животных</h2>
-    <div class="card shadow-sm mt-3">
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Животное</th>
-                    <th>Дата</th>
-                    <th>Сообщение</th>
-                    <th>Статус</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="req : ${myRequests}">
-                    <td th:text="${req.animal.name}">Имя</td>
-                    <td th:text="${#temporals.format(req.requestDate, 'dd.MM.yyyy HH:mm')}">Дата</td>
-                    <td th:text="${req.message}">Сообщение</td>
-                    <td>
-                            <span class="badge"
-                                  th:classappend="${req.status == 'PENDING' ? 'bg-warning' : (req.status == 'APPROVED' ? 'bg-success' : 'bg-danger')}"
-                                  th:text="${req.status}">Статус</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <a href="/catalog" class="btn btn-primary mt-3">Вернуться в каталог</a>
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-stat-home p-4">
+                <h5 class="modal-title fw-bold text-dark" id="editProfileModalLabel"><i class="bi bi-pencil-square me-2"></i>Редактировать личные данные</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/profile/update}" method="post">
+                <div class="modal-body p-4 bg-white">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">Ваше имя в системе</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                            <input type="text" name="fullName" class="form-control border-warning-subtle" th:value="${userName}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 border-top pt-3">
+                        <label class="form-label fw-semibold text-dark">Новый пароль <span class="text-muted small fw-normal">(оставьте пустым, если не меняете)</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                            <input type="password" name="newPassword" class="form-control border-warning-subtle" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer p-3 bg-light border-0">
+                    <button type="button" class="btn btn-link text-secondary" data-bs-dismiss="modal" style="text-decoration: none;">Отмена</button>
+                    <button type="submit" class="btn btn-primary fw-semibold px-4 shadow-sm">Сохранить изменения</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

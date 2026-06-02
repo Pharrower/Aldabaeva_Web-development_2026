@@ -1,0 +1,374 @@
+/* Уютная оранжево-шоколадная палитра для приюта "Доброе сердце" */
+:root {
+    --primary-orange: #f57c00;    /* Насыщенный теплый оранжевый для кнопок и акцентов */
+    --dark-orange: #e65100;       /* Глубокий оранжево-терракотовый для ховеров */
+    --footer-bg: #2d1a12;         /* Глубокий шоколадно-коричневый для шапки и футера */
+    --light-bg: #fff8e1;          /* Нежный пастельный фон для блоков */
+    --hero-gradient: linear-gradient(135deg, #e65100 0%, #2d1a12 100%); /* Благородный темный градиент */
+}
+
+body {
+    background-color: #fafafa;
+    color: #333333;
+}
+
+/* Кастомизация кнопок */
+.btn-primary {
+    background-color: var(--primary-orange) !important;
+    border-color: var(--primary-orange) !important;
+    color: #ffffff !important;
+}
+.btn-primary:hover {
+    background-color: var(--dark-orange) !important;
+    border-color: var(--dark-orange) !important;
+}
+.btn-outline-primary {
+    color: var(--primary-orange) !important;
+    border-color: var(--primary-orange) !important;
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-orange) !important;
+    color: white !important;
+}
+
+/* ОБНОВЛЕННАЯ ШАПКА: Глубокий шоколадный фон со светлым читаемым текстом */
+.navbar-custom {
+    background-color: var(--footer-bg) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 15px 0;
+}
+.navbar-custom .navbar-brand {
+    color: #ffffff !important;
+    font-size: 1.35rem;
+}
+.navbar-custom .nav-link {
+    color: #e0d4cf !important; /* Мягкий светлый оттенок */
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+    color: #ffb74d !important; /* Теплый оранжевый акцент при наведении */
+}
+.navbar-custom .btn-outline-light {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,0.4) !important;
+}
+.navbar-custom .btn-outline-light:hover {
+    background-color: #ffffff !important;
+    color: var(--footer-bg) !important;
+}
+.navbar-custom .btn-outline-dark {
+    color: #ffffff !important;
+    border-color: #ffb74d !important;
+}
+
+/* ОБНОВЛЕННЫЙ HERO-БЛОК: Двухколонный, глубокий и с акцентом */
+.hero-section {
+    background: var(--hero-gradient);
+    color: white;
+    padding: 90px 0;
+    position: relative;
+    overflow: hidden;
+}
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('https://images.unsplash.com/photo-1450778869180-41d0601e046e?q=80&w=1950') center/cover no-repeat;
+    opacity: 0.08; /* Уменьшили яркость подложки, чтобы текст читался идеально */
+    pointer-events: none;
+}
+
+/* Акцентная карточка внутри Hero-блока */
+.hero-accent-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+.hero-accent-card img {
+    border-radius: 16px;
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Иконки преимуществ (общий стиль) */
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary-orange);
+    background: rgba(245, 124, 0, 0.1);
+    padding: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.feature-icon.feature-home {
+    color: #8d6e63 !important;
+    background: rgba(141, 110, 99, 0.1) !important;
+}
+
+/* Карточки питомцев */
+.animal-card {
+    border: none;
+    border-radius: 16px;
+    background-color: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.animal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.08) !important;
+}
+.animal-card img {
+    height: 240px;
+    object-fit: cover;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+/* Настройка стрелочек карусели */
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+    background: rgba(0,0,0,0.1);
+    border-radius: 12px;
+    height: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Контрастный шоколадный футер */
+footer {
+    background-color: var(--footer-bg);
+    color: #e0e0e0 !important;
+    padding: 60px 0 20px 0;
+    margin-top: 80px;
+    border-top: 5px solid var(--primary-orange);
+}
+footer h5, footer h6 {
+    color: #ffffff !important;
+}
+footer p, footer li {
+    color: #ffe0b2 !important;
+}
+footer a {
+    color: #ffb74d !important;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+footer a:hover {
+    color: #ffffff !important;
+    text-decoration: underline;
+}
+footer .border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Дополнительные стили для каталога животных */
+.filter-box {
+    background-color: #fff8e1 !important; /* Нежно-кремовый уютный фон для фильтров */
+    border: 1px solid #ffe0b2 !important;
+    border-radius: 16px;
+}
+
+/* Кастомные бэджи для карточек */
+.badge-species {
+    background-color: rgba(245, 124, 0, 0.15) !important;
+    color: var(--dark-orange) !important;
+    font-weight: 600;
+}
+
+.badge-gender {
+    background-color: #e0d4cf !important;
+    color: var(--footer-bg) !important;
+    font-weight: 500;
+}
+
+/* Кнопка отправки заявки "Хочу забрать" */
+.btn-adopt {
+    background-color: #2e7d32 !important; /* Оставляем зелёной для действия, но делаем благороднее */
+    border-color: #2e7d32 !important;
+    color: #ffffff !important;
+}
+.btn-adopt:hover {
+    background-color: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+}
+
+/* Кнопки администратора */
+.btn-admin-action {
+    background-color: #5d4037 !important;
+    border-color: #5d4037 !important;
+    color: #ffffff !important;
+}
+.btn-admin-action:hover {
+    background-color: var(--footer-bg) !important;
+    border-color: var(--footer-bg) !important;
+    color: #ffffff !important;
+}
+
+/* Специальные стили для страницы помощи */
+.help-card-volunteer {
+    border: 1px solid #c8e6c9 !important;
+}
+
+/* Ребрендинг виджета ЮKassa под нашу шоколадную палитру */
+.yookassa-modal-header {
+    background: linear-gradient(135deg, #5d4037 0%, #2d1a12 100%);
+    color: white;
+}
+.yookassa-logo {
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+/* Стили для динамической валидации полей банковской карты */
+.card-input-valid {
+    border-color: #198754 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right calc(0.375em + 0.1875rem) center !important;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+}
+.card-input-invalid {
+    border-color: #dc3545 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right calc(0.375em + 0.1875rem) center !important;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) !important;
+}
+
+/* Дополнительные стили для страницы "О нас" */
+.stat-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 16px;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(141, 110, 99, 0.15) !important;
+}
+
+/* Кастомные цвета для карточек показателей */
+.bg-stat-home { background-color: #efebe9 !important; color: #5d4037 !important; }
+.bg-stat-pets { background-color: #fff3e0 !important; color: #e65100 !important; }
+.bg-stat-vols { background-color: #f1f8e9 !important; color: #2e7d32 !important; }
+.bg-stat-money { background-color: #e8f5e9 !important; color: #1b5e20 !important; }
+
+/* Стилизация FAQ аккордеона */
+.accordion-button:not(.collapsed) {
+    background-color: #fff8e1 !important;
+    color: var(--dark-orange) !important;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125) !important;
+}
+.accordion-button:focus {
+    border-color: #ffe0b2 !important;
+    box-shadow: 0 0 0 0.25rem rgba(245, 124, 0, 0.25) !important;
+}
+
+/* Карта */
+#map {
+    width: 100%;
+    height: 400px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Стили для личного кабинета (Профиль) */
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    background-color: #fff8e1;
+    color: var(--dark-orange);
+    border: 3px solid #ffe0b2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+/* Кастомные табы */
+.nav-tabs .nav-link {
+    color: var(--footer-bg) !important;
+    font-weight: 600;
+    border: none;
+    border-bottom: 3px solid transparent;
+}
+.nav-tabs .nav-link.active {
+    color: var(--dark-orange) !important;
+    background-color: transparent !important;
+    border: none;
+    border-bottom: 3px solid var(--primary-orange) !important;
+}
+
+/* Карточки заявок и пожертвований */
+.history-item {
+    border-left: 4px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+.history-item.status-pending { border-left-color: #ffb74d; background-color: #fff9c4; }
+.history-item.status-approved { border-left-color: #81c784; background-color: #e8f5e9; }
+.history-item.status-rejected { border-left-color: #e57373; background-color: #ffebee; }
+.history-item.donation-item { border-left-color: #a1887f; background-color: #efebe9; }
+
+/* ==========================================
+   СТИЛИ ДЛЯ СТРАНИЦ АВТОРИЗАЦИИ (LOGIN/REG)
+   ========================================== */
+
+.auth-body {
+    background: linear-gradient(135deg, #fdfbf7 0%, #eef5f3 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.auth-card {
+    border: none;
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.btn-auth {
+    background-color: #ff9f43;
+    border-color: #ff9f43;
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 11px;
+    transition: all 0.3s ease;
+}
+
+.btn-auth:hover {
+    background-color: #f38b2c;
+    border-color: #f38b2c;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 159, 67, 0.3);
+}
+
+.auth-form-control:focus {
+    border-color: #ff9f43;
+    box-shadow: 0 0 0 0.25px rgba(255, 159, 67, 0.25);
+}
+
+.brand-icon {
+    font-size: 3rem;
+    color: #ff9f43;
+    animation: heartBeat 2.5s infinite;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.1); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.1); }
+    70% { transform: scale(1); }
+}

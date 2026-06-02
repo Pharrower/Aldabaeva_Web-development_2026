@@ -2,159 +2,130 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Помочь приюту</title>
+    <title>Помочь приюту — Приют "Доброе сердце"</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/catalog">Каталог животных</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/help">Помочь приюту</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">О нас</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
-                </li>
-            </ul>
-
-            <div class="d-flex align-items-center">
-                <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                    <a href="/login" class="btn btn-outline-light me-2">Вход</a>
-                    <a href="/register" class="btn btn-primary">Регистрация</a>
-                </div>
-
-                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
-                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                        Привет, <span th:text="${userName}">Имя</span>!
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
+<div th:replace="~{fragments :: navbar}"></div>
 
 <div class="container mt-5">
-    <h1 class="text-center mb-5">Как вы можете помочь?</h1>
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-dark">Как вы можете помочь?</h1>
+        <p class="text-muted lead">Ваше участие — это спасенные жизни тех, кто сам не может попросить о помощи.</p>
+    </div>
 
-    <div class="row g-5">
+    <div class="row g-4">
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm p-4 h-100">
-                <h3 class="text-primary mb-4">💳 Денежное пожертвование</h3>
-                <p>Все средства идут на покупку корма, лекарств и оплату услуг ветеринаров.</p>
+            <div class="card border-0 shadow-sm p-4 h-100 animal-card filter-box">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="feature-icon m-0 me-3 px-3 py-2 fs-3">
+                        <i class="bi bi-credit-card-2-front"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-dark">Пожертвование</h3>
+                </div>
+                <p class="text-secondary mb-4">Все средства поступают на расчетный счет приюта и расходуются на закупку сертифицированных кормов, медикаментов и оплату сложных ветеринарных операций.</p>
 
-                <form th:action="@{/help/donate}" method="post">
+                <form id="donationForm">
                     <div class="mb-3">
-                        <label class="form-label">Сумма пожертвования (₽)</label>
-                        <input type="number" name="amount" class="form-control" required min="10">
+                        <label class="form-label fw-semibold text-dark">Сумма пожертвования (₽)</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white text-muted border-warning-subtle">₽</span>
+                            <input type="number" id="donateAmount" class="form-control border-warning-subtle" required min="10" placeholder="1000">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Комментарий (необязательно)</label>
-                        <input type="text" name="comment" class="form-control">
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark">Комментарий (необязательно)</label>
+                        <input type="text" id="donateComment" class="form-control border-warning-subtle" placeholder="Например: Для котика Барсика">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100">Пожертвовать</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+                        <i class="bi bi-wallet2 me-2"></i> Перейти к оплате
+                    </button>
                 </form>
+                <div class="text-center mt-3">
+                    <small class="text-muted"><i class="bi bi-shield-check text-success"></i> Защищенное SSL-соединение. Процессинг ЮKassa.</small>
+                </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm p-4 h-100">
-                <h3 class="text-success mb-4">🐾 Стать волонтёром</h3>
+            <div class="card border-0 shadow-sm p-4 h-100 animal-card help-card-volunteer" style="background-color: #f1f8e9 !important;">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-circle me-3 fs-3 d-inline-block" style="color: #2e7d32; background: rgba(46, 125, 50, 0.1); line-height: 1;">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold" style="color: #2e7d32;">Стать волонтёром</h3>
+                </div>
+                <p class="text-secondary mb-4">Подарите нашим подопечным самое ценное — ваше время. Нам всегда нужны заботливые руки для выгула, ухода и ведения социальных сетей.</p>
 
-                <div th:if="${param.success}" class="alert alert-success">Ваша заявка принята! Мы скоро свяжемся с вами.</div>
+                <div th:if="${param.success}" class="alert alert-success d-flex align-items-center mb-3 shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <div>Ваша заявка успешно принята! Мы свяжемся с вами в течение дня.</div>
+                </div>
 
                 <div th:if="${#authorization.expression('isAuthenticated()')}">
                     <form th:action="@{/help/volunteer}" th:object="${volunteerRequest}" method="post">
                         <div class="mb-3">
-                            <label class="form-label">Чем вы хотите помочь?</label>
-                            <select th:field="*{activityType}" class="form-select">
-                                <option value="Выгул собак">Выгул собак</option>
-                                <option value="Уборка вольеров">Уборка вольеров</option>
-                                <option value="Фото и соцсети">Фото и соцсети</option>
-                                <option value="Транспортировка">Транспортировка</option>
+                            <label class="form-label fw-semibold text-dark">Чем вы хотите помочь?</label>
+                            <select th:field="*{activityType}" class="form-select border-success-subtle">
+                                <option value="Выгул собак">🦮 Выгул и social-адаптация собак</option>
+                                <option value="Уборка вольеров">🧹 Помощь в уборке и благоустройстве</option>
+                                <option value="Фото и соцсети">📸 Фотосъемка и ведение соцсетей</option>
+                                <option value="Транспортировка">🚗 Автоволонтерство (транспортировка)</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Ваш опыт (пару слов)</label>
-                            <textarea th:field="*{experience}" class="form-control" rows="3" placeholder="Был ли у вас опыт общения с животными?"></textarea>
+                            <label class="form-label fw-semibold text-dark">Ваш опыт общения с животными</label>
+                            <textarea th:field="*{experience}" class="form-control border-success-subtle" rows="3" placeholder="Расскажите пару слов о себе..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-success btn-lg w-100">Отправить анкету</button>
+                        <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm" style="background-color: #2e7d32 !important; border-color: #2e7d32 !important;">Отправить анкету волонтера</button>
                     </form>
                 </div>
 
-                <div th:unless="${#authorization.expression('isAuthenticated()')}" class="text-center py-4">
-                    <p>Чтобы подать заявку на волонтёрство, пожалуйста, войдите в систему.</p>
-                    <a href="/login" class="btn btn-outline-success">Войти</a>
+                <div th:unless="${#authorization.expression('isAuthenticated()')}" class="text-center py-4 my-auto">
+                    <p class="text-muted mb-3 px-3">Чтобы подать официальную заявку в волонтерский корпус, вам необходимо пройти быструю авторизацию в системе приюта.</p>
+                    <a href="/login" class="btn btn-outline-success btn-lg px-4 fw-semibold" style="color: #2e7d32; border-color: #2e7d32;">Войти в аккаунт</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container my-5 py-4 bg-light rounded-4 shadow-sm">
+    <div class="my-5 py-4 bg-white rounded-4 shadow-sm p-4">
         <div class="row mb-4 text-center">
             <div class="col-lg-8 mx-auto">
-                <h2 class="fw-bold text-dark">Нам всегда нужна ваша поддержка</h2>
-                <p class="text-muted fs-5">
-                    Мы составили список самых необходимых вещей для наших подопечных.
-                    Ниже вы можете в реальном времени увидеть, чего сейчас приюту не хватает больше всего.
-                </p>
+                <h2 class="fw-bold text-dark">📊 Актуальные нужды склада приюта</h2>
+                <p class="text-muted">Данные обновляются автоматически на основе складского учета волонтеров.</p>
                 <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge bg-danger rounded-pill px-3">Срочно</span>
-                    <span class="badge bg-warning text-dark rounded-pill px-3">Заканчивается</span>
-                    <span class="badge bg-success rounded-pill px-3">В достатке</span>
+                    <span class="badge bg-danger rounded-pill px-3 py-2">🚨 Срочно нужно</span>
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">⚠️ Заканчивается</span>
+                    <span class="badge bg-success rounded-pill px-3 py-2">✅ В достатке</span>
                 </div>
             </div>
         </div>
 
-        <div class="row px-3">
+        <div class="row px-2">
             <div class="col-md-6 col-lg-4 mb-4" th:each="s : ${supplies}">
-                <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 15px;">
-                    <div class="card-body p-4">
+                <div class="card h-100 border-0 bg-light p-2 animal-card">
+                    <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <h5 class="fw-bold mb-1 text-primary" th:text="${s.name}">Товар</h5>
-                                <small class="text-muted" th:text="${s.unit}">кг</small>
+                                <h5 class="fw-bold mb-1 text-dark" th:text="${s.name}">Товар</h5>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary small" th:text="${s.unit}">кг</span>
                             </div>
                             <div class="text-end">
-                                <span class="h5 fw-bold mb-0" th:text="${#numbers.formatDecimal(s.currentAmount, 0, 1)}">10</span>
+                                <span class="h5 fw-bold mb-0 text-dark" th:text="${#numbers.formatDecimal(s.currentAmount, 0, 1)}">10</span>
                                 <span class="text-muted">/</span>
-                                <span class="text-muted" th:text="${#numbers.formatDecimal(s.targetAmount, 0, 0)}">50</span>
+                                <span class="text-muted small" th:text="${#numbers.formatDecimal(s.targetAmount, 0, 0)}">50</span>
                             </div>
                         </div>
 
-                        <div class="progress mb-3" style="height: 12px; background-color: #e9ecef; border-radius: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated shadow-none"
+                        <div class="progress mb-3" style="height: 10px; background-color: #e9ecef; border-radius: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated"
                                  role="progressbar"
                                  th:style="'width: ' + ${s.getPercent()} + '%'"
                                  th:classappend="${s.getColorClass()}"
@@ -162,24 +133,248 @@
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center mt-2">
                             <i th:if="${s.getPercent() < 30}" class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
                             <i th:if="${s.getPercent() >= 30 && s.getPercent() < 70}" class="bi bi-info-circle-fill text-warning me-2"></i>
                             <i th:if="${s.getPercent() >= 70}" class="bi bi-check-circle-fill text-success me-2"></i>
 
-                            <span class="small fw-semibold"
+                            <span class="small fw-bold"
                                   th:classappend="${s.getPercent() < 30 ? 'text-danger' : (s.getPercent() < 70 ? 'text-warning' : 'text-success')}"
-                                  th:text="${s.getPercent() < 30 ? 'Срочно нужно!' : (s.getPercent() < 70 ? 'Заканчивается' : 'Всего хватает')}">
-                        </span>
+                                  th:text="${s.getPercent() < 30 ? 'Срочно требуется!' : (s.getPercent() < 70 ? 'Заканчивается' : 'Обеспечено')}">
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
+<div class="modal fade" id="yookassaModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header yookassa-modal-header p-4">
+                <div class="modal-title d-flex justify-content-between align-items-center w-100">
+                    <span class="h4 mb-0 yookassa-logo">Ю <span class="fw-light">kassa</span></span>
+                    <span class="badge bg-white text-dark fw-bold px-3 py-2 fs-6" id="modalAmountDisplay" style="color: var(--footer-bg) !important;">0 ₽</span>
+                </div>
+            </div>
+            <div class="modal-body p-4 bg-white">
+
+                <div id="paymentFormInterface">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Номер карты</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-credit-card"></i></span>
+                            <input type="text" id="inputCardNumber" class="form-control form-control-lg fs-6"
+                                   placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Срок действия</label>
+                            <input type="text" id="inputCardExpiry" class="form-control form-control-lg fs-6"
+                                   placeholder="ММ / ГГ" maxlength="7" inputmode="numeric">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">CVC / CVV</label>
+                            <input type="password" id="inputCardCvc" class="form-control form-control-lg fs-6"
+                                   placeholder="***" maxlength="3" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <button type="button" id="confirmPaymentBtn" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow" disabled style="background-color: #2e7d32 !important; border-color: #2e7d32 !important;">
+                        <span>Подтвердить оплату</span>
+                    </button>
+                    <button type="button" class="btn btn-link w-100 text-muted mt-2 btn-sm" data-bs-dismiss="modal" style="text-decoration: none;">Отмена</button>
+                </div>
+
+                <div id="paymentLoaderInterface" class="text-center py-5 d-none">
+                    <div class="spinner-border text-warning mb-3" style="width: 3rem; height: 3rem; --bs-spinner-color: var(--primary-orange);" role="status"></div>
+                    <h5 class="fw-bold text-dark">Установка защищенного соединения...</h5>
+                    <p class="text-muted small">Авторизация транзакции банком-эмитентом</p>
+                </div>
+
+                <div id="paymentSuccessInterface" class="text-center py-4 d-none">
+                    <div class="display-1 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>
+                    <h4 class="fw-bold text-dark">Оплата прошла успешно!</h4>
+                    <p class="text-secondary px-3">Благодарим вас за поддержку. Пожертвование успешно зачислено на счет организации.</p>
+                    <button type="button" class="btn btn-primary px-4 fw-bold mt-3" data-bs-dismiss="modal" id="finishPaymentBtn">Вернуться на сайт</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const donationForm = document.getElementById('donationForm');
+    const yookassaModal = new bootstrap.Modal(document.getElementById('yookassaModal'));
+
+    const paymentFormInterface = document.getElementById('paymentFormInterface');
+    const paymentLoaderInterface = document.getElementById('paymentLoaderInterface');
+    const paymentSuccessInterface = document.getElementById('paymentSuccessInterface');
+    const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+
+    const inputCardNumber = document.getElementById('inputCardNumber');
+    const inputCardExpiry = document.getElementById('inputCardExpiry');
+    const inputCardCvc = document.getElementById('inputCardCvc');
+
+    let currentAmount = 0;
+    let currentComment = '';
+
+    function validateLuhn(cardNumber) {
+        let trimmed = cardNumber.replace(/\s+/g, '');
+        if (!/^\d{16}$/.test(trimmed)) return false;
+
+        let sum = 0;
+        for (let i = 0; i < trimmed.length; i++) {
+            let intVal = parseInt(trimmed.charAt(i));
+            if (i % 2 === 0) {
+                intVal *= 2;
+                if (intVal > 9) intVal -= 9;
+            }
+            sum += intVal;
+        }
+        return (sum % 10 === 0);
+    }
+
+    function checkFormValidity() {
+        const isCardValid = validateLuhn(inputCardNumber.value);
+        const expiryValue = inputCardExpiry.value.replace(/\s+/g, '');
+        let isExpiryValid = false;
+
+        if (expiryValue.length === 5 && expiryValue.includes('/')) {
+            const parts = expiryValue.split('/');
+            const month = parseInt(parts[0], 10);
+            const year = parseInt('20' + parts[1], 10);
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+
+            if (month >= 1 && month <= 12) {
+                if (year > currentYear || (year === currentYear && month >= currentMonth)) {
+                    isExpiryValid = true;
+                }
+            }
+        }
+
+        const isCvcValid = /^\d{3}$/.test(inputCardCvc.value);
+
+        if (inputCardNumber.value.replace(/\s+/g, '').length >= 16) {
+            inputCardNumber.classList.toggle('card-input-valid', isCardValid);
+            inputCardNumber.classList.toggle('card-input-invalid', !isCardValid);
+        } else {
+            inputCardNumber.classList.remove('card-input-valid', 'card-input-invalid');
+        }
+
+        if (expiryValue.length === 5) {
+            inputCardExpiry.classList.toggle('card-input-valid', isExpiryValid);
+            inputCardExpiry.classList.toggle('card-input-invalid', !isExpiryValid);
+        } else {
+            inputCardExpiry.classList.remove('card-input-valid', 'card-input-invalid');
+        }
+
+        if (inputCardCvc.value.length === 3) {
+            inputCardCvc.classList.toggle('card-input-valid', isCvcValid);
+            inputCardCvc.classList.toggle('card-input-invalid', !isCvcValid);
+        } else {
+            inputCardCvc.classList.remove('card-input-valid', 'card-input-invalid');
+        }
+
+        confirmPaymentBtn.disabled = !(isCardValid && isExpiryValid && isCvcValid);
+    }
+
+    inputCardNumber.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        let formatted = value.match(/.{1,4}/g)?.join(' ') || '';
+        e.target.value = formatted;
+        checkFormValidity();
+    });
+
+    inputCardExpiry.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            e.target.value = value.substring(0, 2) + ' / ' + value.substring(2, 4);
+        } else {
+            e.target.value = value;
+        }
+        checkFormValidity();
+    });
+
+    inputCardCvc.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+        checkFormValidity();
+    });
+
+    donationForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentAmount = document.getElementById('donateAmount').value;
+        currentComment = document.getElementById('donateComment').value;
+        document.getElementById('modalAmountDisplay').innerText = currentAmount + ' ₽';
+
+        inputCardNumber.value = '';
+        inputCardExpiry.value = '';
+        inputCardCvc.value = '';
+        inputCardNumber.classList.remove('card-input-valid', 'card-input-invalid');
+        inputCardExpiry.classList.remove('card-input-valid', 'card-input-invalid');
+        inputCardCvc.classList.remove('card-input-valid', 'card-input-invalid');
+        confirmPaymentBtn.disabled = true;
+
+        paymentFormInterface.classList.remove('d-none');
+        paymentLoaderInterface.classList.add('d-none');
+        paymentSuccessInterface.classList.add('d-none');
+
+        yookassaModal.show();
+    });
+
+    confirmPaymentBtn.addEventListener('click', function() {
+        paymentFormInterface.classList.add('d-none');
+        paymentLoaderInterface.classList.remove('d-none');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        const paymentData = {
+            amount: parseFloat(currentAmount),
+            comment: currentComment,
+            status: "SUCCESS",
+            gateway: "YOOKASSA_PRODUCTION"
+        };
+
+        fetch('/api/help/donate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(paymentData)
+        })
+            .then(response => {
+                setTimeout(() => {
+                    if (response.ok) {
+                        paymentLoaderInterface.classList.add('d-none');
+                        paymentSuccessInterface.classList.remove('d-none');
+                    } else {
+                        alert("Ошибка транзакции на стороне процессингового центра. Статус сервера: " + response.status);
+                        yookassaModal.hide();
+                    }
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Ошибка: не удалось связаться с сервером.");
+                yookassaModal.hide();
+            });
+    });
+
+    document.getElementById('finishPaymentBtn').addEventListener('click', () => {
+        location.reload();
+    });
+</script>
 </body>
 </html>

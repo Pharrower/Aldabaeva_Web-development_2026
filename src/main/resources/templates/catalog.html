@@ -2,177 +2,130 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Каталог животных</title>
+  <title>Каталог животных — Приют "Доброе сердце"</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" class="bi" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<div th:replace="~{fragments :: navbar}"></div>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="/catalog">Каталог животных</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/help">Помочь приюту</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/about">О нас</a>
-        </li>
-        <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-          <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
-        </li>
-        <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-          <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
-        </li>
-        <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-          <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
-        </li>
-        <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-          <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
-        </li>
-      </ul>
-
-      <div class="d-flex align-items-center">
-        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-          <a href="/login" class="btn btn-outline-light me-2">Вход</a>
-          <a href="/register" class="btn btn-primary">Регистрация</a>
-        </div>
-
-        <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
-          <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-            Привет, <span th:text="${userName}">Имя</span>!
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <form th:action="@{/logout}" method="post">
-                <button type="submit" class="dropdown-item text-danger">Выйти</button>
-              </form>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<div class="container mt-4">
-  <h2 class="mb-4">Наши подопечные</h2>
-
+<div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">🐾 Наши подопечные</h2>
+      <p class="text-muted mb-0">Каждый из них очень ждёт свою любящую семью</p>
+    </div>
     <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-      <a href="/admin/add-animal" class="btn btn-warning shadow-sm">
-        ➕ Добавить нового хвостика
+      <a href="/admin/add-animal" class="btn btn-admin-action fw-bold shadow-sm">
+        <i class="bi bi-plus-circle me-2"></i>Добавить нового хвостика
       </a>
     </div>
   </div>
 
-  <form th:action="@{/catalog}" method="get" class="row g-3 mb-5 p-3 bg-light border rounded">
-    <div class="col-md-4">
-      <label class="form-label">Кто вам нужен?</label>
-      <select name="species" class="form-select">
-        <option value="">Все</option>
-        <option value="Собака">Собаки</option>
-        <option value="Кошка">Кошки</option>
+  <form th:action="@{/catalog}" method="get" class="row g-3 mb-5 p-4 filter-box shadow-sm">
+    <div class="col-md-5">
+      <label class="form-label fw-semibold text-dark">Кто вам нужен?</label>
+      <select name="species" class="form-select border-warning-subtle">
+        <option value="">Все лапки (собаки и кошки)</option>
+        <option value="Собака" th:selected="${param.species != null && param.species[0] == 'Собака'}">Собаки</option>
+        <option value="Кошка" th:selected="${param.species != null && param.species[0] == 'Кошка'}">Кошки</option>
       </select>
     </div>
-    <div class="col-md-4">
-      <label class="form-label">Пол</label>
-      <select name="gender" class="form-select">
-        <option value="">Любой</option>
-        <option value="Мужской">Мальчик</option>
-        <option value="Женский">Девочка</option>
+    <div class="col-md-5">
+      <label class="form-label fw-semibold text-dark">Пол</label>
+      <select name="gender" class="form-select border-warning-subtle">
+        <option value="">Любой пол</option>
+        <option value="Мужской" th:selected="${param.gender != null && param.gender[0] == 'Мужской'}">Мальчик</option>
+        <option value="Женский" th:selected="${param.gender != null && param.gender[0] == 'Женский'}">Девочка</option>
       </select>
     </div>
-    <div class="col-md-4 d-flex align-items-end">
-      <button type="submit" class="btn btn-primary w-100">Применить фильтры</button>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
+        <i class="bi bi-funnel-fill me-1"></i> Найти
+      </button>
     </div>
   </form>
 
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col" th:each="animal : ${listAnimals}">
-      <div class="card h-100 shadow-sm border-0">
-        <div style="overflow: hidden; background-color: #f8f9fa;">
+      <div class="card h-100 animal-card shadow-sm">
+        <div style="overflow: hidden; background-color: #f8f9fa; border-top-left-radius: 16px; border-top-right-radius: 16px;">
           <img th:src="${animal.imageUrl != null ? animal.imageUrl : 'https://via.placeholder.com/300x250?text=Нет+фото'}"
-               class="card-img-top" alt="фото"
-               style="height: 250px; object-fit: cover;">
+               class="card-img-top" alt="фото питомца">
         </div>
 
-        <div class="card-body">
-          <h5 class="card-title fw-bold" th:text="${animal.name}">Имя</h5>
-          <p class="card-text text-muted mb-2">
-            <span class="badge bg-info text-dark" th:text="${animal.species}">Вид</span>
-            <span class="badge bg-light text-dark border" th:text="${animal.gender}">Пол</span>
-          </p>
-          <p class="small text-secondary" th:text="${animal.description}">Описание...</p>
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title fw-bold text-dark mb-2" th:text="${animal.name}">Имя</h4>
 
-          <div class="adoption-box">
-            <div class="alert alert-success d-none success-message" role="alert">
-              Заявка отправлена! Мы свяжемся с вами.
+          <div class="mb-3">
+            <span class="badge badge-species me-1 px-2 py-1.5" th:text="${animal.species}">Вид</span>
+            <span class="badge badge-gender px-2 py-1.5" th:text="${animal.gender}">Пол</span>
+            <span class="badge bg-light text-dark border px-2 py-1.5 ms-1" th:text="${animal.age + ' лет'}">Возраст</span>
+          </div>
+
+          <p class="small text-secondary mb-4" th:text="${animal.description}">Описание...</p>
+
+          <div class="adoption-box mt-auto">
+            <div class="alert alert-success d-none success-message py-2 text-center shadow-sm" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>Заявка отправлена! Мы свяжемся с вами.
             </div>
 
             <form th:action="@{/adopt/{id}(id=${animal.id})}" method="post" class="mt-2 ajax-form">
-              <div class="small text-danger d-none error-message mb-1">
-                Пожалуйста, напишите причину подробнее (не менее 10 символов).
+              <div class="small text-danger d-none error-message mb-2 fw-semibold">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Пожалуйста, напишите причину подробнее (не менее 10 символов).
               </div>
 
-              <div class="input-group input-group-sm mb-3">
+              <div class="input-group">
                 <input type="text" name="message" class="form-control" placeholder="Почему хотите забрать?" required>
-                <button class="btn btn-success" type="submit">Хочу забрать</button>
+                <button class="btn btn-adopt fw-semibold" type="submit">Хочу забрать</button>
               </div>
             </form>
           </div>
 
-          <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="mt-2 border-top pt-2">
-            <a th:href="@{/admin/edit-animal/{id}(id=${animal.id})}" class="btn btn-sm btn-outline-warning w-100">✏️ Редактировать</a>
+          <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="mt-3 border-top pt-2">
+            <a th:href="@{/admin/edit-animal/{id}(id=${animal.id})}" class="btn btn-sm btn-outline-secondary w-100 fw-semibold">
+              <i class="bi bi-pencil-square me-1"></i> Редактировать карточку
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<div th:replace="~{fragments :: footer}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   document.querySelectorAll('.ajax-form').forEach(form => {
     form.addEventListener('submit', function(e) {
-      // 1. Всегда блокируем стандартную перезагрузку страницы
       e.preventDefault();
 
       const currentForm = this;
       const inputField = currentForm.querySelector('input[name="message"]');
       const errorMessage = currentForm.querySelector('.error-message');
 
-      // 2. Валидация на клиенте: проверяем длину текста (без пробелов по краям)
       if (inputField.value.trim().length < 10) {
-        errorMessage.classList.remove('d-none'); // Показываем ошибку
-        inputField.classList.add('is-invalid'); // Подсвечиваем поле красной рамкой Bootstrap
-        return; // Останавливаем выполнение функции, AJAX не отправится!
+        errorMessage.classList.remove('d-none');
+        inputField.classList.add('is-invalid');
+        return;
       }
 
-      // Если проверка пройдена, убираем старые отметки об ошибках
       errorMessage.classList.add('d-none');
       inputField.classList.remove('is-invalid');
 
       const url = currentForm.getAttribute('action');
       const formData = new FormData(currentForm);
 
-      // 3. Отправляем асинхронный AJAX-запрос на сервер
       fetch(url, {
         method: 'POST',
         body: formData
       })
               .then(response => {
                 if (response.ok) {
-                  // 4. Если сервер ответил "ОК", прячем форму и показываем текст успеха
                   const box = currentForm.closest('.adoption-box');
                   currentForm.classList.add('d-none');
                   box.querySelector('.success-message').classList.remove('d-none');
@@ -189,4 +142,3 @@
 </script>
 </body>
 </html>
-

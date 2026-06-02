@@ -2,122 +2,152 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Управление заявками</title>
+    <title>Управление складом приюта — Панель администратора</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Локальные стилизации элементов управления склада для гармонии с теплыми тонами сайта */
+        .form-control-focus-orange:focus {
+            border-color: #ff9f43 !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 159, 67, 0.25) !important;
+        }
+        .btn-orange-theme {
+            background-color: #ff9f43;
+            border-color: #ff9f43;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-orange-theme:hover {
+            background-color: #f38b2c;
+            border-color: #f38b2c;
+            color: white;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div th:replace="~{fragments :: navbar}"></div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/catalog">Каталог животных</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/help">Помочь приюту</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">О нас</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
-                </li>
-            </ul>
+<div class="container mt-5 mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark"><i class="bi bi-box-seam text-warning me-2"></i>Складской учет приюта</h2>
+            <p class="text-muted mb-0">Контроль запасов корма, медикаментов и хозяйственных товаров</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="/catalog" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Вернуться в каталог
+            </a>
+        </div>
+    </div>
 
-            <div class="d-flex align-items-center">
-                <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                    <a href="/login" class="btn btn-outline-light me-2">Вход</a>
-                    <a href="/register" class="btn btn-primary">Регистрация</a>
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-bold text-dark mb-3">
+                <i class="bi bi-plus-circle-fill text-success me-2"></i>Добавить новую позицию
+            </h5>
+            <form th:action="@{/admin/supplies/save}" th:object="${newSupply}" method="post" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Наименование</label>
+                    <input type="text" th:field="*{name}" class="form-control form-control-focus-orange border-light-subtle" placeholder="Сухой корм для собак" required>
                 </div>
-
-                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
-                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                        Привет, <span th:text="${userName}">Имя</span>!
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">В наличии</label>
+                    <input type="number" step="0.1" min="0" th:field="*{currentAmount}" class="form-control form-control-focus-orange border-light-subtle" placeholder="15.0" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">Необходимая норма</label>
+                    <input type="number" step="0.1" min="0" th:field="*{targetAmount}" class="form-control form-control-focus-orange border-light-subtle" placeholder="50.0" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">Ед. изм.</label>
+                    <input type="text" th:field="*{unit}" class="form-control form-control-focus-orange border-light-subtle" placeholder="кг / шт" required>
+                </div>
+                <div class="col-md-3 mt-md-4 pt-2">
+                    <button type="submit" class="btn btn-orange-theme w-100 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Занести на склад
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<div class="container mt-5">
-    <h2>Управление складом приюта</h2>
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Добавить новый тип товара</h5>
-            <form th:action="@{/admin/supplies/save}" th:object="${newSupply}" method="post" class="row g-3">
-                <div class="col-md-3">
-                    <input type="text" th:field="*{name}" class="form-control" placeholder="Название (например, Плед)" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" step="0.1" th:field="*{currentAmount}" class="form-control" placeholder="Сейчас" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" step="0.1" th:field="*{targetAmount}" class="form-control" placeholder="Цель" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" th:field="*{unit}" class="form-control" placeholder="Ед. изм. (кг/шт)" required>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-success w-100">Добавить</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <table class="table table-hover align-middle shadow-sm bg-white rounded">
-        <thead class="table-dark">
-        <tr>
-            <th>Наименование</th>
-            <th>Текущее количество</th>
-            <th>Цель (норма)</th>
-            <th>Ед. изм.</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="s : ${supplies}">
-            <form th:action="@{/admin/supplies/save}" method="post">
-                <input type="hidden" name="id" th:value="${s.id}">
-                <td><input type="text" name="name" th:value="${s.name}" class="form-control form-control-sm"></td>
-                <td><input type="number" step="0.1" name="currentAmount" th:value="${s.currentAmount}" class="form-control form-control-sm"></td>
-                <td><input type="number" step="0.1" name="targetAmount" th:value="${s.targetAmount}" class="form-control form-control-sm"></td>
-                <td><input type="text" name="unit" th:value="${s.unit}" class="form-control form-control-sm"></td>
-                <td>
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-sm btn-primary">Обновить</button>
-                        <a th:href="@{/admin/supplies/delete/{id}(id=${s.id})}" class="btn btn-sm btn-outline-danger">Удалить</a>
-                    </div>
-                </td>
-            </form>
-        </tr>
-        </tbody>
-    </table>
+    <div class="card shadow border-0 overflow-hidden rounded-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th class="ps-4 py-3 fw-semibold">Наименование ресурса</th>
+                    <th class="py-3 fw-semibold text-center" style="width: 15%;">Текущий остаток</th>
+                    <th class="py-3 fw-semibold text-center" style="width: 15%;">Целевая норма</th>
+                    <th class="py-3 fw-semibold text-center" style="width: 10%;">Ед. изм.</th>
+                    <th class="py-3 fw-semibold" style="width: 25%;">Состояние обеспечения</th>
+                    <th class="text-end pe-4 py-3 fw-semibold" style="width: 15%;">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:if="${#lists.isEmpty(supplies)}">
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-archive display-4 d-block mb-2 text-black-50"></i>
+                        На складе пока нет зарегистрированных товаров.
+                    </td>
+                </tr>
+
+                <tr th:each="s : ${supplies}">
+                    <td class="ps-4">
+                        <input type="text" name="name" th:value="${s.name}" th:form="${'form-' + s.id}" class="form-control form-control-sm fw-bold border-0 bg-transparent text-dark form-control-focus-orange rounded" required>
+                    </td>
+                    <td>
+                        <input type="number" step="0.1" min="0" name="currentAmount" th:value="${s.currentAmount}" th:form="${'form-' + s.id}" class="form-control form-control-sm text-center border-light-subtle form-control-focus-orange" required>
+                    </td>
+                    <td>
+                        <input type="number" step="0.1" min="0" name="targetAmount" th:value="${s.targetAmount}" th:form="${'form-' + s.id}" class="form-control form-control-sm text-center border-light-subtle form-control-focus-orange" required>
+                    </td>
+                    <td>
+                        <input type="text" name="unit" th:value="${s.unit}" th:form="${'form-' + s.id}" class="form-control form-control-sm text-center border-0 bg-transparent text-muted" readonly>
+                    </td>
+
+                    <td>
+                        <div class="me-3">
+                            <th:block th:with="percent=${s.targetAmount > 0 ? (s.currentAmount * 100 / s.targetAmount) : 0}">
+                                <div class="progress" style="height: 8px; border-radius: 5px; background-color: #e9ecef;">
+                                    <div class="progress-bar rounded-5"
+                                         role="progressbar"
+                                         th:style="'width: ' + (${percent > 100 ? 100 : percent}) + '%'"
+                                         th:classappend="${percent < 40 ? 'bg-danger' : (percent < 100 ? 'bg-warning text-dark' : 'bg-success')}">
+                                    </div>
+                                </div>
+                                <small class="mt-1 d-block fw-semibold small"
+                                       th:classappend="${percent < 40 ? 'text-danger' : (percent < 100 ? 'text-warning' : 'text-success')}"
+                                       th:text="${percent < 100 ? '⚠️ Дефицит ' + #numbers.formatDecimal(s.targetAmount - s.currentAmount, 1, 1) + ' ' + s.unit : '✅ Норма выполнена'}">
+                                    Статус
+                                </small>
+                            </th:block>
+                        </div>
+                    </td>
+
+                    <td class="text-end pe-4">
+                        <form th:id="${'form-' + s.id}" th:action="@{/admin/supplies/save}" method="post" style="display: none;">
+                            <input type="hidden" name="id" th:value="${s.id}">
+                        </form>
+
+                        <div class="btn-group shadow-sm">
+                            <button type="submit" th:form="${'form-' + s.id}" class="btn btn-sm btn-outline-primary px-3" title="Сохранить изменения">
+                                <i class="bi bi-save-fill"></i>
+                            </button>
+                            <a th:href="@{/admin/supplies/delete/{id}(id=${s.id})}" class="btn btn-sm btn-outline-danger px-3" title="Удалить товар"
+                               onclick="return confirm('Вы уверены, что хотите удалить эту позицию со склада?')">
+                                <i class="bi bi-trash3-fill"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

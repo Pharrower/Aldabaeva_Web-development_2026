@@ -2,18 +2,34 @@ package com.example.shelter.services;
 
 import com.example.shelter.entities.User;
 import com.example.shelter.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // Используем конструктор (по аналогии с другими сервисами)
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+    }
+
+    public void updateProfile(String email, String newName, String newPassword) {
+        User user = findByEmail(email);
+        user.setFirstName(newName);
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+        userRepository.save(user);
+    }
 
     public void registerUser(User user) {
         // Шифруем пароль перед сохранением

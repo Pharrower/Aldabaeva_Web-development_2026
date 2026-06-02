@@ -2,125 +2,87 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Управление пожертвованиями</title>
+    <title>Управление пожертвованиями — Панель администратора</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
-        .stat-card {
-            background: linear-gradient(45deg, #4e73df, #224abe);
+        /* Благородный градиент для финансовых итогов в единой стилистике с кнопками сайта */
+        .stat-card-financial {
+            background: linear-gradient(135deg, #20c997 0%, #198754 100%);
             color: white;
             border-radius: 15px;
+            min-width: 250px;
         }
     </style>
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">🐾 Приют "Доброе сердце"</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div th:replace="~{fragments :: navbar}"></div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/catalog">Каталог животных</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/help">Помочь приюту</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">О нас</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/requests">Пристройство</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/volunteers">Волонтеры</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/donations">Пожертвования</a>
-                </li>
-                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                    <a class="nav-link text-warning" href="/admin/supplies">Склад</a>
-                </li>
-            </ul>
-
-            <div class="d-flex align-items-center">
-                <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                    <a href="/login" class="btn btn-outline-light me-2">Вход</a>
-                    <a href="/register" class="btn btn-primary">Регистрация</a>
-                </div>
-
-                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown">
-                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown">
-                        Привет, <span th:text="${userName}">Имя</span>!
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-content ms-3" href="/profile" style="text-decoration: none; color: black;">Мой профиль</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+<div class="container mt-5 mb-5">
+    <div class="row mb-4 align-items-center g-3">
+        <div class="col-md-7">
+            <h2 class="fw-bold text-dark"><i class="bi bi-cash-coin text-success me-2"></i>История пожертвований</h2>
+            <p class="text-muted mb-0">Мониторинг всех входящих транзакций из платежного шлюза ЮKassa</p>
         </div>
-    </div>
-</nav>
-
-<div class="container mt-5">
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h2 class="fw-bold text-dark">История пожертвований</h2>
-            <p class="text-muted">Список всех денежных поступлений от благотворителей</p>
-        </div>
-        <div class="col-md-6 text-md-end">
-            <div class="card stat-card d-inline-block p-3 shadow">
-                <h5 class="mb-0">Общая сумма сборов:</h5>
+        <div class="col-md-5 text-md-end">
+            <div class="card stat-card-financial d-inline-block p-3 shadow-sm border-0 text-start text-md-end">
+                <small class="text-uppercase fw-bold opacity-75 d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Общая сумма сборов приюта</small>
                 <h2 class="fw-bold mb-0" th:text="${#numbers.formatDecimal(totalAmount, 1, 2) + ' ₽'}">0.00 ₽</h2>
             </div>
         </div>
     </div>
 
-    <div class="card shadow border-0 overflow-hidden">
+    <div class="card shadow border-0 overflow-hidden rounded-3">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
                 <tr>
-                    <th class="ps-4">Благотворитель</th>
-                    <th>Сумма</th>
-                    <th>Дата и время</th>
-                    <th>Комментарий</th>
+                    <th class="ps-4 py-3 fw-semibold">Благотворитель</th>
+                    <th class="py-3 fw-semibold">Сумма поступления</th>
+                    <th class="py-3 fw-semibold">Дата и время транзакции</th>
+                    <th class="py-3 fw-semibold">Комментарий к платежу</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${donations.empty}">
-                    <td colspan="4" class="text-center py-5 text-muted">Пожертвований пока не поступало.</td>
+
+                <tr th:if="${#lists.isEmpty(donations)}">
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-wallet2 display-4 d-block mb-2 text-black-50"></i>
+                        Пожертвований в базе данных пока не обнаружено.
+                    </td>
                 </tr>
 
                 <tr th:each="d : ${donations}">
                     <td class="ps-4">
                         <div th:if="${d.user != null}">
-                            <span class="fw-bold" th:text="${d.user.firstName}">Имя</span><br>
-                            <small class="text-muted" th:text="${d.user.email}">email</small>
+                            <span class="fw-bold text-dark" th:text="${d.user.firstName}">Имя</span><br>
+                            <a th:href="${'mailto:' + d.user.email}" class="text-decoration-none small text-muted">
+                                <i class="bi bi-envelope me-1"></i><span th:text="${d.user.email}">email</span>
+                            </a>
                         </div>
                         <div th:unless="${d.user != null}">
-                            <span class="badge bg-secondary">Анонимно</span>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold px-2 py-1">
+                                <i class="bi bi-incognito me-1"></i>Анонимный перевод
+                            </span>
                         </div>
                     </td>
                     <td>
-                        <span class="fw-bold text-success" th:text="${'+ ' + d.amount + ' ₽'}">+ 0 ₽</span>
+                        <span class="fw-bold text-success fs-5" th:text="${'+ ' + #numbers.formatDecimal(d.amount, 1, 2) + ' ₽'}">+ 0.00 ₽</span>
                     </td>
-                    <td class="text-secondary" th:text="${#temporals.format(d.donatedAt, 'dd.MM.yyyy HH:mm')}">
-                        12.04.2024
+                    <td class="text-secondary small">
+                        <i class="bi bi-clock me-1"></i>
+                        <span th:text="${#temporals.format(d.donatedAt, 'dd.MM.yyyy HH:mm')}">12.04.2026 15:30</span>
                     </td>
                     <td>
-                        <small class="fst-italic text-muted" th:text="${d.comment != null && d.comment != '' ? d.comment : '—'}">
-                            Нет комментария
-                        </small>
+                        <div class="p-2 bg-light rounded text-dark border-start border-3 text-wrap small"
+                             th:classappend="${d.comment != null && d.comment != '' ? 'border-warning' : 'border-secondary'}"
+                             style="max-width: 300px; max-height: 75px; overflow-y: auto;">
+                            <span th:text="${d.comment != null && d.comment != '' ? d.comment : 'Без сопроводительного текста'}">
+                                Нет комментария
+                            </span>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
@@ -128,8 +90,13 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <a href="/help" class="btn btn-outline-primary btn-sm">Перейти на страницу помощи</a>
+    <div class="mt-4 d-flex gap-2">
+        <a href="/catalog" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="bi bi-grid-3x3-gap me-1"></i> В каталог
+        </a>
+        <a href="/admin/supplies" class="btn btn-sm rounded-pill px-3 text-white" style="background-color: #ff9f43; border-color: #ff9f43;">
+            <i class="bi bi-box-seam me-1"></i> Управление складом
+        </a>
     </div>
 </div>
 

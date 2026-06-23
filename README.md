@@ -137,10 +137,10 @@ mvn clean package
 | **Покрытие тестами (JaCoCo)**      | 47%                     |
 
 #### График активности коммитов
-![График активности](docs/images/commit-activity.png)
+![График активности](images/commit-activity.png)
 
 #### Тепловая карта (Punch Card)
-![Тепловая карта](docs/images/punch-card.png)
+![Тепловая карта](images/punch-card.png)
 
 
  ### 8. Авторы
